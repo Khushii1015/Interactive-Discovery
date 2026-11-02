@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#08100f">
+  <title>CASE 017 — The Last Login</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <main class="terminal">
+    <div class="scanlines" aria-hidden="true"></div>
+    <header class="system-bar">
+      <span>◈ BLACKWOOD // RECOVERY TERMINAL</span>
+      <span class="system-status">● LOCAL ACCESS <time id="clock"></time></span>
+    </header>
+
+    <section id="intro" class="intro" aria-labelledby="case-title">
+      <p class="eyebrow">RECOVERED DEVICE // INCIDENT 017</p>
+      <h1 id="case-title">THE LAST<br><span>LOGIN.</span></h1>
+      <p>Forty-seven days ago, researcher Mara Vale disappeared. Her laptop was recovered with its hard drive partially erased.</p>
+      <p class="warning">THE OFFICIAL REPORT CLAIMS SHE LEFT VOLUNTARILY.</p>
+      <button id="begin" class="primary">BEGIN INVESTIGATION ↗</button>
+    </section>
+
+    <section id="desktop" class="desktop hidden" aria-label="Investigation desktop">
+      <div class="desktop-heading">
+        <p class="eyebrow">RECOVERY SESSION // UNVERIFIED USER</p>
+        <h2>Recovered workstation</h2>
+        <p>Inspect the files in any order. Some records only become meaningful after other discoveries.</p>
+      </div>
+      <nav class="app-grid" aria-label="Recovered applications">
+        <button data-open="logs"><span class="app-icon">⌁</span>ACCESS LOGS<small>EVENT HISTORY</small></button>
+        <button data-open="photos"><span class="app-icon">▧</span>SECURITY STILLS<small>IMAGE ARCHIVE</small></button>
+        <button data-open="messages"><span class="app-icon">▤</span>MESSAGES<small>DELETED THREADS</small></button>
+        <button data-open="map"><span class="app-icon">⌗</span>FACILITY MAP<small>LOWER LEVEL</small></button>
+        <button data-open="vault"><span class="app-icon">▣</span>ENCRYPTED DRIVE<small id="vault-label">LOCKED</small></button>
+        <button data-open="evidence"><span class="app-icon">◇</span>EVIDENCE BOARD<small id="clue-label">0 / 4 CLUES</small></button>
+      </nav>
+      <p class="desktop-hint">TIP: REVISIT THE ACCESS LOG AFTER INSPECTING THE SECURITY FOOTAGE.</p>
+    </section>
+
+    <section id="panel" class="panel hidden" role="dialog" aria-modal="true" aria-labelledby="panel-title" tabindex="-1">
+      <div class="panel-bar"><span id="panel-title">ARCHIVE</span><button id="close" aria-label="Close panel">✕ CLOSE</button></div>
+      <div id="panel-content" class="panel-content"></div>
+    </section>
+    <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+    <footer class="status-bar"><span>CASE 017 / CLASSIFIED</span><span id="status">0 / 4 CLUES</span><button id="restart">RESET ↺</button></footer>
+  </main>
+  <p class="outside">SOME RECORDS WERE ERASED. OTHERS WERE LEFT FOR YOU.</p>
+  <audio id="signal" src="assets/signal.wav" preload="none"></audio>
+
+  <template id="view-logs" data-title="ACCESS LOG">
+    <p class="meta">DEVICE HISTORY / RECOVERED SECTORS</p>
+    <h2>Incident timeline</h2>
+    <div class="personnel">
+      <img src="assets/mara.jpg" alt="Photographic portrait of fictional researcher Mara Vale">
+      <div>
+        <strong>MARA VALE</strong>
+        <p>Research Division<br>Missing for 47 days<br>Last recorded access: 02:17</p>
+      </div>
+    </div>
+    <div class="record">
+      01:55 — Corridor camera operating normally.<br>
+      02:17 — Basement security door accessed.<br>
+      02:19 — Camera network disconnected.<br>
+      02:21 — Records corrupted.
+    </div>
+    <p data-if="photo">A recovered image has exposed a missing system event. Decrypting archive…</p>
+    <p data-unless="photo">The record is incomplete. Inspect the security stills, then return to see what changes.</p>
+    <div id="delayed-log" class="record" data-reveal="log">
+      <strong>HIDDEN EVENT / 02:17:43</strong>
+      <p>Door B-04 opened using a security override from <strong>INSIDE</strong> the facility. The official report claimed Mara exited through the front gate.</p>
+      <button class="action" data-action="collect" data-clue="log" data-message="HIDDEN EVENT SAVED" data-done="✓ EVIDENCE SAVED">SAVE RECOVERED ENTRY</button>
+    </div>
+  </template>
+
+  <template id="view-photos" data-title="SECURITY STILLS">
+    <p class="meta">CAMERA NETWORK / PARTIAL RECOVERY</p>
+    <h2>Two surviving frames</h2>
+    <p>Open each image to examine the recovered metadata. Look carefully at the door label.</p>
+    <div class="photo-grid">
+      <button data-open="detail"><img src="assets/camera04.jpg" alt="Grainy security still of a sealed basement door marked B-04"><span>CAM_04 · BASEMENT DOOR · 02:17</span></button>
+      <button data-action="toast" data-message="No metadata anomaly in this frame."><img src="assets/camera02.jpg" alt="Dark corridor security still showing a distant unidentified silhouette"><span>CAM_02 · CORRIDOR · 01:55</span></button>
+    </div>
+  </template>
+
+  <template id="view-detail" data-title="IMAGE METADATA">
+    <p class="meta">CAM_04 / IMAGE ANALYSIS</p>
+    <h2>Basement door</h2>
+    <div class="photo-detail"><img src="assets/camera04.jpg" alt="Security footage of door B-04"></div>
+    <table class="data-table">
+      <tr><td>CAMERA</td><td>04 / LOWER LEVEL</td></tr>
+      <tr><td>TIME</td><td>02:17:43</td></tr>
+      <tr><td>DOOR ID</td><td><strong>B04</strong> (without hyphen)</td></tr>
+      <tr><td>ANOMALY</td><td>Door opened from inside; no exit recorded.</td></tr>
+    </table>
+    <button class="action" data-action="collect" data-clue="photo" data-message="DOOR IDENTIFIER SAVED" data-done="✓ CLUE COLLECTED">SAVE DOOR IDENTIFIER</button>
+  </template>
+
+  <template id="view-messages" data-title="RECOVERED MESSAGES">
+    <p class="meta">DELETED THREAD / PARTIALLY RECOVERED</p>
+    <h2>Unknown contact</h2>
+    <div class="message">UNKNOWN: They changed the access code. Use the door identifier from the security image.</div>
+    <div class="message alt">MARA: And the second half?</div>
+    <div class="message">UNKNOWN: The bird we saw on the roof. Black feathers. It watched us for hours.</div>
+    <div class="message alt">MARA: So the identifier first, then the bird's name. No spaces.</div>
+    <p>Figure out the bird and combine it with the door identifier to make the key.</p>
+    <button class="action" data-action="collect" data-clue="messages" data-message="RECOVERED THREAD SAVED" data-done="✓ THREAD SAVED">SAVE MESSAGE THREAD</button>
+  </template>
+
+  <template id="view-map" data-title="FACILITY BLUEPRINT">
+    <p class="meta">BLACKWOOD / LOWER LEVEL BLUEPRINT</p>
+    <h2>The missing room</h2>
+    <img class="map-image" src="assets/blueprint.jpg" alt="Facility blueprint showing the basement B-04 sector highlighted in red">
+    <p>Room B-04 connects to a maintenance tunnel. This route was excluded from the official floor plan.</p>
+    <button class="action" data-action="collect" data-clue="map" data-message="HIDDEN ROUTE ADDED" data-done="✓ ROUTE RECORDED">MARK MAINTENANCE TUNNEL</button>
+  </template>
+
+  <template id="view-evidence" data-title="EVIDENCE BOARD">
+    <p class="meta">PERSONAL INVESTIGATION BOARD</p>
+    <h2>Collected evidence</h2>
+    <div class="clue">
+      <strong data-check="photo">DOOR IDENTIFIER</strong>
+      <p data-if="photo">CAM_04: Door B04, 02:17:43.</p>
+      <p data-unless="photo">Inspect the basement security image.</p>
+    </div>
+    <div class="clue">
+      <strong data-check="messages">DELETED THREAD</strong>
+      <p data-if="messages">The key combines a door ID and a black-feathered bird.</p>
+      <p data-unless="messages">Read and save the deleted conversation.</p>
+    </div>
+    <div class="clue">
+      <strong data-check="log">HIDDEN ACCESS EVENT</strong>
+      <p data-if="log">The door opened from inside, contradicting the report.</p>
+      <p data-unless="log">Return to the access log after finding the door.</p>
+    </div>
+    <div class="clue">
+      <strong data-check="map">ESCAPE ROUTE</strong>
+      <p data-if="map">A concealed maintenance tunnel leads out of B-04.</p>
+      <p data-unless="map">Inspect the facility blueprint (optional, but changes an ending).</p>
+    </div>
+    <p class="meta" data-fill>ENDINGS DISCOVERED: {endingCount} / 3</p>
+    <p data-fill>{endingNames}</p>
+  </template>
+
+  <template id="view-vault" data-title="ENCRYPTED DRIVE">
+    <p class="meta">ENCRYPTION / TWO-FACTOR ARCHIVE</p>
+    <h2>Locked evidence</h2>
+    <p>Required: security image, message thread, and recovered access event.</p>
+    <div class="record">
+      <span data-check="photo">IMAGE IDENTIFIER</span><br>
+      <span data-check="messages">MESSAGE THREAD</span><br>
+      <span data-check="log">ACCESS EVENT</span>
+    </div>
+    <p>Combine the door ID with the bird mentioned in the messages. Example format: <strong>A01SPARROW</strong>.</p>
+    <label for="key">DECRYPTION KEY</label>
+    <input class="input" id="key" autocomplete="off" placeholder="ENTER KEY">
+    <button class="action" data-action="unlock">DECRYPT DRIVE →</button>
+    <p id="error" class="red" role="alert"></p>
+  </template>
+
+  <template id="view-vault-open" data-title="ENCRYPTED DRIVE">
+    <p class="meta">ACCESS GRANTED</p>
+    <h2>Drive decrypted</h2>
+    <p>The final recording is available.</p>
+    <button class="action" data-open="ending">PLAY FINAL RECORDING →</button>
+  </template>
+
+  <template id="view-ending" data-title="FINAL RECORDING">
+    <p class="meta">CLASSIFIED AUDIO / MARA VALE / 02:16</p>
+    <h2>Final transmission</h2>
+    <div class="record">
+      <strong>TRANSCRIPT</strong>
+      <p>"They falsified the reports. I have proof. I'm heading for the basement, but the cameras are already down. If you find this, don't assume I'm dead."</p>
+      <p class="red">[TRANSMISSION INTERRUPTED]</p>
+    </div>
+    <button class="action secondary" data-action="audio">▶ PLAY RECOVERED SIGNAL</button>
+    <p>The recording leaves one decision. Will you expose the documents, or protect Mara's location?</p>
+    <div class="choices">
+      <button class="action" data-action="finish" data-choice="publish">PUBLISH EVIDENCE</button>
+      <button class="action secondary" data-action="finish" data-choice="hide">KEEP IT SECRET</button>
+    </div>
+    <div id="result" aria-live="polite"></div>
+  </template>
+
+  <template id="ending-result">
+    <div class="result">
+      <strong data-fill>{title}</strong>
+      <p data-fill>{story}</p>
+      <p data-fill>ENDING {count} OF 3 DISCOVERED</p>
+      <button class="action secondary" data-open="evidence">EXPLORE ANOTHER PATH →</button>
+    </div>
+  </template>
+</body>
+</html>
